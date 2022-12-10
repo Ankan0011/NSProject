@@ -1,0 +1,5 @@
+pyspark==3.2.2
+delta-spark==2.0.0
+graphframes==0.6
+pandas==1.5.2
+networkx==2.8.8
