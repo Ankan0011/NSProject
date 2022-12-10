@@ -23,6 +23,7 @@ listDesDir =[x[0].split("/")[-1] for x in os.walk(destination_path)]
 # List out all directories in the source
 listSrcDir  = [x[0] for x in os.walk(test_txs_path)]
 
+# This will loop over each weekly transactions folder in src and process a graph logic for the analysis.
 for x in listSrcDir:
     if x.find("date=2022")  != -1:
         dirname = x.split("/")[-1]
