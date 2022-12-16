@@ -20,7 +20,8 @@ listSrcDir  = [x[0] for x in os.walk(test_txs_path)]
 # List out all directories in the destination 
 listDesDir =[x[0].split("/")[-1] for x in os.walk(destination_path)]
 
-alg = cpnet.Lip() #Fast Bipartition Algo
+# J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures 
+alg = cpnet.Surprise() 
 
 def count_dict(core, weekno):
     core_count = 0
@@ -47,8 +48,8 @@ for x in listSrcDir:
             x = alg.get_coreness()  # Get the coreness of nodes
             df_response = pd.DataFrame.from_records(count_dict(x, weekno), columns =['week_no', 'core_count', 'network_size'])
             spark_df = spark.createDataFrame(df_response)
-            # spark_df.show()
-            spark_df.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
+            spark_df.show()
+            # spark_df.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
 
 
 # x = alg.get_coreness()  # Get the coreness of nodes
