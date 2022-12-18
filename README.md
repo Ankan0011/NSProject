@@ -10,7 +10,7 @@ Please login into the VM using the ssh connection. Clone the project in a folder
 ```
 cd NSProject
 sudo pip install -r requirements.txt
-sudo python3 setup install
+sudo python3 setup.py install
 ```
 
 This commands will install all the python packages and install the helper functions in `/util` directory to be used in the code. I have created a sample code in sample folder. You can execute the code by following the below comment.
