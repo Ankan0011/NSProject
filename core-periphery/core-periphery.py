@@ -13,8 +13,10 @@ destination_path="/home/ubuntu/NSProject/dataset/dataset-new/curated/core-periph
 e1_cols=["SenderId","TargetId","Year_no","Week_no"]
 e1_final=["src","dst","relationship"]
 
+# Initialize Spark Session
 spark = initalizeGraphSpark("Core-Periphery")
 
+# List out all directories in the source 
 listSrcDir  = [x[0] for x in os.walk(test_txs_path)]
 
 # List out all directories in the destination 
@@ -23,6 +25,10 @@ listDesDir =[x[0].split("/")[-1] for x in os.walk(destination_path)]
 # J. van Lidth de Jeude, G. Caldarelli, T. Squartini. Detecting Core-Periphery Structures 
 alg = cpnet.Surprise() 
 
+# x = alg.get_coreness()  # Get the coreness of nodes
+# c = alg.get_pair_id()  # Get the group membership of nodes
+
+# Function to count the core nodes
 def count_dict(core, weekno):
     core_count = 0
     for i in core.values():
@@ -30,7 +36,7 @@ def count_dict(core, weekno):
             core_count += 1
     return [(weekno, core_count, len(core))]
 
-
+# Traverse over individual data file
 for x in listSrcDir:
     if x.find("date=20")  != -1:
         dirname = x.split("/")[-1]
@@ -48,9 +54,6 @@ for x in listSrcDir:
             x = alg.get_coreness()  # Get the coreness of nodes
             df_response = pd.DataFrame.from_records(count_dict(x, weekno), columns =['week_no', 'core_count', 'network_size'])
             spark_df = spark.createDataFrame(df_response)
-            spark_df.show()
-            # spark_df.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
-
-
-# x = alg.get_coreness()  # Get the coreness of nodes
-# c = alg.get_pair_id()  # Get the group membership of nodes
+            # spark_df.show()
+            # Write the output to destination directory
+            spark_df.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
