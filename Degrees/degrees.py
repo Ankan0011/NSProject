@@ -16,9 +16,9 @@ e1_cols=["SenderId","TargetId","Year_no","Week_no"]
 e1_final=["from","to","relationship"]
 
 final_columns_degree = ["degrees (tuples)", "degrees", "time_week"]
-final_columns_stats = ["nr_nodes", "mean_degree", "density", "time_week" ]
+final_columns_stats = ["nr_nodes", "nr_edges", "mean_degree","median_degree", "density", "time_week" ]
 
-spark = initalizeGraphSpark("Closeness Centrality")
+spark = initalizeGraphSpark("Degree Distribution")
 # df_accounts = loadFile(spark, accounts_path, True ).filter(df_accounts['Type'] == 1)
 
 # List out all directories in the destination 
@@ -45,17 +45,20 @@ for x in listSrcDir:
 
             # Create a directional graph from edgelist from Pandas
             G = nx.from_pandas_edgelist(e1, "from", "to", create_using=nx.DiGraph())
-            #Number of Nodes
+            #Number of Nodes & Edges
             nr_nodes = G.number_of_nodes()
+            nr_edges = G.number_of_edges()
             #degree & avg. Degree
             g_deg = nx.degree(G)
             g_degrees = [g_deg[i] for i in G.nodes()]
+            median_degree= np.median([tup[1] for tup in g_deg])
             avg_degree = np.mean([tup[1] for tup in g_deg])
+
             #Density
             density = nx.density(G)
 
             deg_nodes = [(str(g_deg), str(g_degrees), dirname.split("=")[-1])]
-            deg_stats = [(str(nr_nodes), str(avg_degree), str(density), dirname.split("=")[-1])]
+            deg_stats = [(str(nr_nodes), str(nr_edges), str(avg_degree), str(median_degree), str(density), dirname.split("=")[-1])]
             df_degree = spark.createDataFrame(deg_nodes).toDF(*final_columns_degree)
             df_degree_stats = spark.createDataFrame(deg_stats).toDF(*final_columns_stats)
 
@@ -64,7 +67,7 @@ for x in listSrcDir:
             df_degree_stats.show()
 
             #Write the rows in a directory
-            df_degree.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
-            df_degree_stats.write.option("header", True).mode('overwrite').csv(destination_path_stats+"/"+dirname)
+            #df_degree.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
+            #df_degree_stats.write.option("header", True).mode('overwrite').csv(destination_path_stats+"/"+dirname)
 
 spark.stop()

@@ -7,14 +7,14 @@ import networkx as nx
 
 # Paths
 test_txs_path="/home/ubuntu/NSProject/dataset/dataset-new/raw/all_txs"
-destination_path="/home/ubuntu/NSProject/dataset/dataset-new/stage/Assortativity"
+destination_path="/home/ubuntu/NSProject/dataset/dataset-new/stage/Attributes"
 
 # Variables
 e1_cols=["SenderId","TargetId","Year_no","Week_no"]
 e1_final=["from","to","relationship"]
-final_columns_assort = ["degree_assort","time_week"]
+final_columns_assort = ["avg_clustering","degree_assortativity", "time_week"]
 
-spark = initalizeGraphSpark("Degree Assortativity")
+spark = initalizeGraphSpark("Attributes")
 # df_accounts = loadFile(spark, accounts_path, True ).filter(df_accounts['Type'] == 1)
 
 # List out all directories in the destination 
@@ -42,12 +42,14 @@ for x in listSrcDir:
             # Create a directional graph from edgelist from Pandas
             G = nx.from_pandas_edgelist(e1, "from", "to", create_using=nx.DiGraph())
             assort_coeff = nx.degree_assortativity_coefficient(G)
+            avg_clust = nx.average_clustering(G)
 
-            assort = [(str(assort_coeff), dirname.split("=")[-1])]
-            df_assort = spark.createDataFrame(assort).toDF(*final_columns_assort)
-            #df_assort.show()
+
+            attributes = [(str(avg_clust), str(assort_coeff), dirname.split("=")[-1])]
+            df_attributes = spark.createDataFrame(attributes).toDF(*final_columns_assort)
+            df_attributes.show()
 
             #Write the rows in a directory
-            df_assort.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
+            df_attributes.write.option("header", True).mode('overwrite').csv(destination_path+"/"+dirname)
 
 spark.stop()
