@@ -41,3 +41,9 @@ def loadFile(spark, path, header):
                 .option("ignoreTrailingWhiteSpace", "true") \
                 .csv(path+"/*.csv")
         return df
+
+def gini(x):
+    total = 0
+    for i, xi in enumerate(x[:-1], 1):
+        total += np.sum(np.abs(xi - x[i:]))
+    return total / (len(x)**2 * np.mean(x))
