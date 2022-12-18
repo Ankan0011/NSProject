@@ -7,7 +7,7 @@ import networkx as nx
 
 # Paths
 test_txs_path="/home/ubuntu/NSProject/dataset/dataset-new/raw/all_txs"
-destination_path="/home/ubuntu/NSProject/dataset/dataset-new/stage/SSC"
+destination_path="/home/ubuntu/NSProject/dataset/dataset-new/curated/SSC"
 
 # Variables
 e1_cols=["SenderId","TargetId","Year_no","Week_no"]
