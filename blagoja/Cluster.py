@@ -1,4 +1,4 @@
-from utils.helper import initalizeGraphSpark,loadFile, gini
+from utils.helper import initalizeGraphSpark,loadFile
 from pyspark.sql.functions import *
 # from graphframes import *
 import pandas as pd
@@ -17,7 +17,9 @@ e1_cols=["SenderId","TargetId","Year_no","Week_no"]
 e1_final=["from","to","relationship"]
 
 final_columns_nodes = ["cluster", "time_week"]
-final_columns_stats = ["mean_cluster", "std_cluster", "gini_coefficient", "time_week" ]
+final_columns_stats = ["mean_cluster", "std_cluster", "time_week" ]
+
+final_columns = ["degree_assort","time_week"]
 
 spark = initalizeGraphSpark("Cluster")
 # df_accounts = loadFile(spark, accounts_path, True ).filter(df_accounts['Type'] == 1)
@@ -43,26 +45,20 @@ for x in listSrcDir:
             # Null checks on the essential columns
             e1 = df_final.filter(col("from").isNotNull()).filter(col("to").isNotNull()) \
                 .groupBy("from","to").count().withColumn("relationship",lit('txs')).select(e1_final).toPandas()
+            try:
+                # Create a directional graph from edgelist from Pandas
+                G = nx.from_pandas_edgelist(e1, "from", "to", create_using=nx.Graph())
+                coeff = nx.average_clustering(G)
+                print("Coefficient is :"+str(coeff))
 
-            # Create a directional graph from edgelist from Pandas
-            G = nx.from_pandas_edgelist(e1, "from", "to", create_using=nx.DiGraph())
-            cluster_nodes = approximation.average_clustering(G,trials=1000, seed=10)
-            cluster_mean = np.array(list(cluster_nodes.values())).mean()
-            cluster_std = np.array(list(cluster_nodes.values())).std()
-            cluster_gini = gini(np.array(list(cluster_nodes.values())))
+                data = [(str(coeff), dirname.split("=")[-1])]
+                next = spark.createDataFrame(data).toDF(*final_columns)
+                next.show()
 
-
-            #cluster_nodes = [(str(cluster_nodes), dirname.split("=")[-1])]
-            cluster_stats = [(str(cluster_mean), str(cluster_std), str(cluster_gini), dirname.split("=")[-1])]
-            #df_cluster_nodes = spark.createDataFrame(cluster_nodes).toDF(*final_columns_nodes)
-            df_cluster_stats = spark.createDataFrame(cluster_stats).toDF(*final_columns_stats)
-
-            #Show the Output in the terminal
-            #df_cluster_nodes.show()
-            #df_cluster_stats.show()
-
-            #Write the rows in a directory
-            #df_cluster_nodes.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
-            df_cluster_stats.write.option("header", True).mode('overwrite').csv(destination_path_stats+"/"+dirname)
+                # Uncomment the below line to write the rows in a directory
+                next.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
+            except NameError:
+                print("Exception")
+                print(NameError)
 
 spark.stop()

@@ -1,4 +1,4 @@
-from utils.helper import initalizeGraphSpark,loadFile, gini
+from utils.helper import initalizeGraphSpark,loadFile
 from pyspark.sql.functions import *
 # from graphframes import *
 import pandas as pd
@@ -16,7 +16,7 @@ e1_cols=["SenderId","TargetId","Year_no","Week_no"]
 e1_final=["from","to","relationship"]
 
 final_columns_nodes = ["diameter", "time_week"]
-final_columns_stats = ["mean_diameter", "std_diameter", "gini_coefficient", "time_week" ]
+final_columns_stats = ["mean_diameter", "std_diameter", "time_week" ]
 
 spark = initalizeGraphSpark("Diameter")
 # df_accounts = loadFile(spark, accounts_path, True ).filter(df_accounts['Type'] == 1)
@@ -48,11 +48,11 @@ for x in listSrcDir:
             diameter_nodes = nx.diameter(G)
             diameter_mean = np.array(list(diameter_nodes.values())).mean()
             diameter_std = np.array(list(diameter_nodes.values())).std()
-            diameter_gini = gini(np.array(list(diameter_nodes.values())))
+            #diameter_gini = gini(np.array(list(diameter_nodes.values())))
 
 
             #diameter_nodes = [(str(diameter_nodes), dirname.split("=")[-1])]
-            diameter_stats = [(str(diameter_mean), str(diameter_std), str(diameter_gini), dirname.split("=")[-1])]
+            diameter_stats = [(str(diameter_mean), str(diameter_std), dirname.split("=")[-1])]
             #df_diameter_nodes = spark.createDataFrame(diameter_nodes).toDF(*final_columns_nodes)
             df_diameter_stats = spark.createDataFrame(diameter_stats).toDF(*final_columns_stats)
 
