@@ -1,4 +1,3 @@
-README.md
 setup.py
 util.egg-info/PKG-INFO
 util.egg-info/SOURCES.txt
