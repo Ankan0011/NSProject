@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 from delta import *
 from pyspark.sql.functions import *
 from datetime import datetime
+import numpy as np
 
 
 #Graph Spark packages
@@ -41,3 +42,9 @@ def loadFile(spark, path, header):
                 .option("ignoreTrailingWhiteSpace", "true") \
                 .csv(path+"/*.csv")
         return df
+
+def gini(x):
+    total = 0
+    for i, xi in enumerate(x[:-1], 1):
+        total += np.sum(np.abs(xi - x[i:]))
+    return total / (len(x)**2 * np.mean(x))

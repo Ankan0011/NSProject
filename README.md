@@ -17,7 +17,7 @@ This commands will install all the python packages and install the helper functi
 
 ```
 cd sample
-python3 SCC.py
+python3 sample.py
 ```
 
 ### Setup the project on VSCODE guildlines ###
