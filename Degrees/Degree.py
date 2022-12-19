@@ -8,8 +8,8 @@ import networkx as nx
 
 # Paths
 test_txs_path="/home/ubuntu/NSProject/dataset/dataset-new/raw/all_txs"
-destination_path_nodes="/home/ubuntu/NSProject/dataset/dataset-new/stage/Degrees1"
-destination_path_stats="/home/ubuntu/NSProject/dataset/dataset-new/stage/Stats/Degrees1"
+destination_path_nodes="/home/ubuntu/NSProject/dataset/dataset-new/stage/Degrees"
+destination_path_stats="/home/ubuntu/NSProject/dataset/dataset-new/stage/Stats/Degrees"
 
 # Variables
 e1_cols=["SenderId","TargetId","Year_no","Week_no"]
@@ -67,7 +67,7 @@ for x in listSrcDir:
             df_degree_stats.show()
 
             #Write the rows in a directory
-            #df_degree.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
-            #df_degree_stats.write.option("header", True).mode('overwrite').csv(destination_path_stats+"/"+dirname)
+            df_degree.write.option("header", True).mode('overwrite').csv(destination_path_nodes+"/"+dirname)
+            df_degree_stats.write.option("header", True).mode('overwrite').csv(destination_path_stats+"/"+dirname)
 
 spark.stop()
