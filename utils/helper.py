@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 from delta import *
 from pyspark.sql.functions import *
 from datetime import datetime
+import numpy as np
 
 
 #Graph Spark packages
